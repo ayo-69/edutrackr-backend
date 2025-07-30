@@ -40,7 +40,10 @@ app.get("/", (req: Request, res: Response) => {
 
 // === Routes ===
 import auth from "./routes/auth";
+import record from "./routes/record"; // Importing the record route
+
 app.use("/api/auth", auth);
+app.use("/api/records", record); // Importing the record route
 
 app.listen(PORT, (): void => {
     console.log(`Server started on port: ${PORT}`);
