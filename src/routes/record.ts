@@ -5,12 +5,14 @@ import upload from "../config/multer";
 import authMiddleware from "../middleware/authMiddleware";
 import { parseAndStore } from "../services/upload.service";
 import Record from "../models/Record";
+import deleteFile from "../utils/deleteFile.js";
+import { getFailingStudents } from "../controllers/record.js";
     
 const router = Router();
 
 /**
  * @swagger
- * /:
+ * /api/students:
  *   post:
  *     summary: Upload a CSV file and store records
  *     tags:
@@ -94,6 +96,10 @@ router.post("/", authMiddleware, upload.single("file"), async (req: Request, res
             });
             await newRecord.save();
         }
+
+        // Delete the file after process 
+        deleteFile(file.path);
+        
         res.status(200).json({ message: "CVS processed", records })
 
     } catch (err) {
@@ -101,5 +107,44 @@ router.post("/", authMiddleware, upload.single("file"), async (req: Request, res
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+/**
+ * @swagger
+ * /api/students/failing:
+ *   get:
+ *     summary: Get students who are failing
+ *     tags:
+ *       - Records
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of failing students
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       401:
+ *         description: User not authenticated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get("/failing", authMiddleware, getFailingStudents);
 
 export default router;
