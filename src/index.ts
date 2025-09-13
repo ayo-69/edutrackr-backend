@@ -4,6 +4,7 @@ import morgan from "morgan";
 import { connectDB } from "./config/db";
 import { PORT } from "./config/env"; // Importing the PORT from env config
 import { setupSwagger } from "./config/swagger";
+import cors from "cors";
 
 connectDB(); // Call the function to connect to the database
 dotenv.config();
@@ -17,6 +18,7 @@ console.log(`Swagger documentation is set up. Running on http://localhost:${PORT
 // === Middleware ===
 app.use(express.json());
 app.use(morgan("tiny"));
+app.use(cors());
 
 /**
  * @swagger
